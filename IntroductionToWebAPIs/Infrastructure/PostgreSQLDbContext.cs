@@ -1,0 +1,30 @@
+﻿using IntroductionToWebAPIs.BaseEntities;
+using IntroductionToWebAPIs.Entity;
+using Microsoft.EntityFrameworkCore;
+
+namespace IntroductionToWebAPIs.Infrastructure
+{
+    public class PostgreSQLDbContext : DbContext
+    {
+        public PostgreSQLDbContext(DbContextOptions<PostgreSQLDbContext> options) : base(options)
+        {
+
+        }
+
+        public DbSet<Unit> Units { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Ignore<BaseEntity>();
+
+            // FluentAPI
+            modelBuilder.Entity<Unit>(entity => { entity.HasKey(p => p.Id); });
+            modelBuilder.Entity<User>(entity => { entity.HasKey(p => p.Id); });
+            modelBuilder.Entity<Supplier>(entity => { entity.HasKey(p => p.Id); });
+            
+            base.OnModelCreating(modelBuilder);
+        }
+    }
+}
