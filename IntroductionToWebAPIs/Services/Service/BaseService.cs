@@ -11,65 +11,59 @@ namespace IntroductionToWebAPIs.Services.Service
 
         IPostgreSQLRepository<T> _repository;
 
-        public BaseService(IPostgreSQLRepository<T> repository, IConfiguration config, PostgreSQLDbContext context)
+        public BaseService(
+            IPostgreSQLRepository<T> repository,
+            IConfiguration config,
+            PostgreSQLDbContext context
+            )
         {
-            _repository = repository;
-            _config = config;
-            _context = context;
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-
-
-        public string Create(T item)
+        public async Task<IEnumerable<T>> GetAllAsync(CancellationToken ct = default)
         {
-            var nameProperty = typeof(T).GetProperty("Name");
-            if (nameProperty != null)
-            {
-                var nameValue = nameProperty.GetValue(item) as string;
-                if (string.IsNullOrEmpty(nameValue))
-                {
-                    return "The name cannot be empty";
-                }
-            }
-
-            _repository.Create(item);
-            return $"Created new item with this ID: {item}";
+            return await _repository.GetAllAsync(ct);
         }
 
-        public string Delete(Guid id)
+        public async Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default)
         {
-            var result = _repository.Delete(id);
-            if (result)
-                return "Item deleted";
-            else
-                return "Item not found";
+            return await _repository.GetByIdAsync(id, ct);
         }
 
-        public IQueryable<T> GetAll()
+        public async Task<T> CreateAsync(T item, CancellationToken ct = default)
         {
-            return _repository.GetAll();
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
+            return await _repository.CreateAsync(item, ct);
         }
 
-        public T GetById(Guid id)
+        public async Task<bool> UpdateAsync(Guid id, T item, CancellationToken ct = default)
         {
-            return _repository.GetById(id);
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
+            // Проверяем, существует ли запись
+            var existing = await _repository.GetByIdAsync(id, ct);
+            if (existing == null)
+                return false;
+
+            // Копируем данные из item в существующий объект (если нужно)
+            // Здесь можно использовать AutoMapper или написать вручную
+            // Например: CopyProperties(item, existing);
+
+            return await _repository.UpdateAsync(item, ct);
         }
 
-        public string Update(Guid id, T item)
+        public async Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)
         {
-            var _item = _repository.GetById(id);
-            if (_item is not null)
-            {
-                _item = item;
+            var existing = await _repository.GetByIdAsync(id, ct);
+            if (existing == null)
+                return false;
 
-
-
-                var result = _repository.Update(_item);
-                if (result)
-                    return "Item updated";
-            }
-
-            return "Item updated";
+            return await _repository.DeleteAsync(id, ct);
         }
     }
 }

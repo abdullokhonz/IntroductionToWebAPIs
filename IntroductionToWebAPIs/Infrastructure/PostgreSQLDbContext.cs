@@ -14,6 +14,7 @@ namespace IntroductionToWebAPIs.Infrastructure
         public DbSet<Unit> Units { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Client> Clients { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

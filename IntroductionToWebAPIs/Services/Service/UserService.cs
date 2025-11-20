@@ -16,61 +16,56 @@ namespace IntroductionToWebAPIs.Services.Service
             IConfiguration config,
             PostgreSQLDbContext context)
         {
-            _repository = repository;
-            _config = config;
-            _context = context;
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
 
 
-        public string Create(User item)
+        public async Task<IEnumerable<User>> GetAllAsync(CancellationToken ct = default)
         {
-            if (string.IsNullOrEmpty(item.Name))
-            {
-                return "The name cannot be empty";
-            }
-            else
-            {
-                _repository.Create(item);
-                return $"Created new item with this ID: {item.Id}";
-            }
+            return await _repository.GetAllAsync(ct);
         }
 
-        public string Delete(Guid id)
+        public async Task<User?> GetByIdAsync(Guid id, CancellationToken ct = default)
         {
-            var result = _repository.Delete(id);
-            if (result)
-                return "Item deleted";
-            else
-                return "Item not found";
+            return await _repository.GetByIdAsync(id, ct);
         }
 
-        public IQueryable<User> GetAll()
+        public async Task<User> CreateAsync(User item, CancellationToken ct = default)
         {
-            return _repository.GetAll();
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
+            var result = await _repository.CreateAsync(item, ct);
+
+            return result;
         }
 
-        public User GetById(Guid id)
+        public async Task<bool> UpdateAsync(Guid id, User item, CancellationToken ct = default)
         {
-            return _repository.GetById(id);
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
+            var existing = await _repository.GetByIdAsync(id, ct);
+            if (existing == null)
+                return false;
+
+            var result = await _repository.UpdateAsync(item, ct);
+
+            return result;
         }
 
-        public string Update(Guid id, User item)
+        public async Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)
         {
-            var _item = _repository.GetById(id);
+            var existing = await _repository.GetByIdAsync(id, ct);
+            if (existing == null)
+                return false;
 
-            if (_item is not null)
-            {
-                _item.Name = item.Name;
+            var result = await _repository.DeleteAsync(existing.Id, ct);
 
-
-
-                var result = _repository.Update(_item);
-                if (result)
-                    return "Item updated";
-            }
-
-            return "Item Not updated";
+            return result;
         }
     }
 }

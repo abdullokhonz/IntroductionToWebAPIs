@@ -3,71 +3,69 @@ using IntroductionToWebAPIs.Infrastructure;
 using IntroductionToWebAPIs.Repositories;
 using IntroductionToWebAPIs.Services.IService;
 
-public class UnitService : IUnitService
+namespace IntroductionToWebAPIs.Services.Service
 {
-    private readonly IConfiguration _config;
-    private readonly PostgreSQLDbContext _context;
-    IPostgreSQLRepository<Unit> _repository;
-
-    public UnitService(
-        IPostgreSQLRepository<Unit> repository,
-        IConfiguration config,
-        PostgreSQLDbContext context)
+    public class UnitService : IUnitService
     {
-        _repository = repository;
-        _config = config;
-        _context = context;
-    }
+        private readonly IConfiguration _config;
+        private readonly PostgreSQLDbContext _context;
+        IPostgreSQLRepository<Unit> _repository;
 
-
-
-    public string Create(Unit item)
-    {
-        if (string.IsNullOrEmpty(item.Name))
+        public UnitService(
+            IPostgreSQLRepository<Unit> repository,
+            IConfiguration config,
+            PostgreSQLDbContext context)
         {
-            return "The name cannot be empty";
-        }
-        else
-        {
-            _repository.Create(item);
-            return $"Created new item with this ID: {item.Id}";
-        }
-    }
-
-    public string Delete(Guid id)
-    {
-        var result = _repository.Delete(id);
-        if (result)
-            return "Item deleted";
-        else
-            return "Item not found";
-    }
-
-    public IQueryable<Unit> GetAll()
-    {
-        return _repository.GetAll();
-    }
-
-    public Unit GetById(Guid id)
-    {
-        return _repository.GetById(id);
-    }
-
-    public string Update(Guid id, Unit item)
-    {
-        var _item = _repository.GetById(id);
-
-        if (_item is not null)
-        {
-            _item.Name = item.Name;
-
-
-
-            var result = _repository.Update(_item);
-            if (result)
-                return "Item updated";
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        return "Item Not updated";
+
+
+        public async Task<IEnumerable<Unit>> GetAllAsync(CancellationToken ct = default)
+        {
+            return await _repository.GetAllAsync(ct);
+        }
+
+        public async Task<Unit?> GetByIdAsync(Guid id, CancellationToken ct = default)
+        {
+            return await _repository.GetByIdAsync(id, ct);
+        }
+
+        public async Task<Unit> CreateAsync(Unit item, CancellationToken ct = default)
+        {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
+            var result = await _repository.CreateAsync(item, ct);
+
+            return result;
+        }
+
+        public async Task<bool> UpdateAsync(Guid id, Unit item, CancellationToken ct = default)
+        {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
+            var existing = await _repository.GetByIdAsync(id, ct);
+            if (existing == null)
+                return false;
+
+            var result = await _repository.UpdateAsync(item, ct);
+
+            return result;
+        }
+
+        public async Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)
+        {
+            var existing = await _repository.GetByIdAsync(id, ct);
+            if (existing == null)
+                return false;
+
+            var result = await _repository.DeleteAsync(existing.Id, ct);
+
+            return result;
+        }
     }
 }

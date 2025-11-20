@@ -1,75 +1,87 @@
 ﻿using IntroductionToWebAPIs.BaseEntities;
 using IntroductionToWebAPIs.Infrastructure;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace IntroductionToWebAPIs.Repositories
 {
     public class PostgreSQLRepository<T> : IPostgreSQLRepository<T> where T : BaseEntity
     {
         readonly PostgreSQLDbContext _context;
-        public PostgreSQLRepository(PostgreSQLDbContext autoProductContext)
+        private readonly DbSet<T> _dbSet;
+        public PostgreSQLRepository(PostgreSQLDbContext context)
         {
-            _context = autoProductContext;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _dbSet = _context.Set<T>();
         }
-        public bool Create(T item)
+
+        public async Task<IEnumerable<T>> GetAllAsync(CancellationToken ct, Expression<Func<T, bool>>? filter = null)
         {
-            try
+            IQueryable<T> query = _dbSet.AsNoTracking();
+            if (filter != null)
             {
-                Console.WriteLine($"Добавление в БД: {item}");
-                _context.Add(item);
-                var result = _context.SaveChanges();
-
-                Console.WriteLine($"SaveChanges() выполнен, изменено {result} записей.");
-
-                return result > 0;
+                query = query.Where(filter);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при сохранении: {ex.Message}");
+            return await query.ToListAsync(ct);
+        }
+
+        public async Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default)
+        {
+            return await _dbSet.FindAsync(new object[] { id }, ct);
+        }
+
+        public async Task<T> CreateAsync(T item, CancellationToken ct = default)
+        {
+            if (item == null) throw new ArgumentNullException(nameof(item));
+
+            await _dbSet.AddAsync(item, ct);
+            await _context.SaveChangesAsync(ct);
+            return item;
+        }
+
+        public async Task<bool> UpdateAsync(T entity, CancellationToken ct = default)
+        {
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+
+            _dbSet.Update(entity);
+            return await _context.SaveChangesAsync(ct) > 0;
+        }
+
+        public async Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)
+        {
+            var entity = await GetByIdAsync(id, ct);
+            if (entity == null)
                 return false;
-            }
+
+            _dbSet.Remove(entity);
+            return await _context.SaveChangesAsync(ct) > 0;
         }
 
-
-        public bool Delete(Guid id)
+        public async Task<(IEnumerable<T> Items, int TotalCount)> GetPageAsync(int page, int size, CancellationToken ct = default)
         {
-            try
-            {
-                var item = _context.Set<T>().SingleOrDefault(w => w.Id == id);
-                if (item is not null)
-                {
-                    _context.Remove(item);
-                    var result = _context.SaveChanges();
-                    return result > 0;
-                }
-            }
-            catch
-            { }
+            if (page <= 0) page = 1;
+            if (size <= 0) size = 10;
 
-            return false;
+            var total = await _dbSet.CountAsync(ct);
+            var items = await _dbSet
+                .AsNoTracking()
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync(ct);
+
+            return (items, total);
         }
 
-        public IQueryable<T> GetAll()
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
         {
-            return _context.Set<T>();
-        }
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
-        public T GetById(Guid id)
-        {
-            return _context.Set<T>().SingleOrDefault(w => w.Id == id)!;
-        }
-
-        public bool Update(T item)
-        {
-            try
-            {
-                _context.Update(item);
-                var result = _context.SaveChanges();
-                return result > 0;
-            }
-            catch
-            {
-                return false;
-            }
+            return await _dbSet
+                .AsNoTracking()
+                .Where(predicate)
+                .ToListAsync(ct);
         }
     }
 }

@@ -2,14 +2,15 @@
 {
     public interface IBaseService<TEntity>
     {
-        IQueryable<TEntity> GetAll();
+        Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken ct = default);
 
-        TEntity GetById(Guid id);
+        Task<TEntity?> GetByIdAsync(Guid id, CancellationToken ct = default);
 
-        string Create(TEntity item);
+        Task<TEntity> CreateAsync(TEntity item, CancellationToken ct = default);
 
-        string Update(Guid id, TEntity item);
+        Task<bool> UpdateAsync(Guid id, TEntity item, CancellationToken ct = default);
 
-        string Delete(Guid id);
+        Task<bool> DeleteAsync(Guid id, CancellationToken ct = default);
     }
 }
+ 

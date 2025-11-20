@@ -12,11 +12,12 @@ builder.Services.AddDbContext<PostgreSQLDbContext>(options =>
     .LogTo(Console.Write, LogLevel.Information)
     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
-builder.Services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
-builder.Services.AddScoped(typeof(IPostgreSQLRepository<>), typeof(PostgreSQLRepository<>));
 builder.Services.AddScoped<IUnitService, UnitService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IPremiumCalculationService, PremiumCalculationService>();
+builder.Services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
+builder.Services.AddScoped(typeof(IPostgreSQLRepository<>), typeof(PostgreSQLRepository<>));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

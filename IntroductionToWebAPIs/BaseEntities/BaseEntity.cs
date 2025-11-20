@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace IntroductionToWebAPIs.BaseEntities
 {
     public class BaseEntity
     {
         [Key]
-        public Guid Id { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public virtual Guid Id { get; set; } = Guid.NewGuid();
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
     }
 }

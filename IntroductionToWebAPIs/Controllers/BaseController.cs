@@ -1,5 +1,4 @@
 ﻿using IntroductionToWebAPIs.Services.IService;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IntroductionToWebAPIs.Controllers
@@ -16,34 +15,34 @@ namespace IntroductionToWebAPIs.Controllers
         }
 
         [HttpGet("AllItems")]
-        public virtual IEnumerable<TEntity> Get()
+        public async virtual Task<IEnumerable<TEntity>> Get(CancellationToken ct = default)
         {
-            return _service.GetAll();
+            return await _service.GetAllAsync(ct);
         }
 
         [HttpGet("GetItemById")]
-        public virtual TEntity Get(Guid id)
+        public async virtual Task<TEntity> Get(Guid id, CancellationToken ct = default)
         {
-            return _service.GetById(id);
+            return await _service.GetByIdAsync(id, ct);
         }
 
-        [HttpPost("Create")]
-        public virtual string Post([FromBody] TEntity item)
+        [HttpPost("CreateAsync")]
+        public async virtual Task<TEntity> Post([FromBody] TEntity item, CancellationToken ct = default)
         {
-            return _service.Create(item);
+            return await _service.CreateAsync(item, ct);
         }
 
-        [HttpPut("Update")]
-        public virtual string Put([FromQuery] Guid id, [FromBody] TEntity item)
+        [HttpPut("UpdateAsync")]
+        public async virtual Task<bool> Put([FromQuery] Guid id, [FromBody] TEntity item, CancellationToken ct = default)
         {
-            return _service.Update(id, item);
+            return await _service.UpdateAsync(id, item, ct);
         }
 
-        [HttpDelete("Delete")]
+        [HttpDelete("DeleteAsync")]
         // [Authorize(Roles = "admin")]
-        public virtual string Delete([FromQuery] Guid id)
+        public async virtual Task<bool> Delete([FromQuery] Guid id, CancellationToken ct = default)
         {
-            return _service.Delete(id);
+            return await _service.DeleteAsync(id, ct);
         }
     }
 }
