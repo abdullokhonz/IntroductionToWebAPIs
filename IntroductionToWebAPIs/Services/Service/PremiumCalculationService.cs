@@ -16,7 +16,7 @@ namespace IntroductionToWebAPIs.Services.Service
 
         public async Task<PremiumCalculationResult> CalculateAsync(Guid clientId, CancellationToken ct = default)
         {
-            var client = await _clientService.GetByIdAsync(clientId);
+            var client = await _clientService.PremiumGetByIdAsync(clientId);
             if (client == null)
                 throw new KeyNotFoundException("Клиент не найден");
 
