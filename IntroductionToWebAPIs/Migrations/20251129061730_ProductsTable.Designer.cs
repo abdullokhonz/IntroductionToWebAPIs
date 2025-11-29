@@ -3,6 +3,7 @@ using System;
 using IntroductionToWebAPIs.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IntroductionToWebAPIs.Migrations
 {
     [DbContext(typeof(PostgreSQLDbContext))]
-    partial class PostgreSQLDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251129061730_ProductsTable")]
+    partial class ProductsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,37 +96,6 @@ namespace IntroductionToWebAPIs.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Clients");
-                });
-
-            modelBuilder.Entity("IntroductionToWebAPIs.Entity.Price", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("Value")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Prices");
                 });
 
             modelBuilder.Entity("IntroductionToWebAPIs.Entity.Product", b =>
@@ -282,17 +254,6 @@ namespace IntroductionToWebAPIs.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("IntroductionToWebAPIs.Entity.Price", b =>
-                {
-                    b.HasOne("IntroductionToWebAPIs.Entity.Product", "Product")
-                        .WithMany("Prices")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("IntroductionToWebAPIs.Entity.Product", b =>
                 {
                     b.HasOne("IntroductionToWebAPIs.Entity.Category", "Category")
@@ -331,11 +292,6 @@ namespace IntroductionToWebAPIs.Migrations
             modelBuilder.Entity("IntroductionToWebAPIs.Entity.Category", b =>
                 {
                     b.Navigation("Children");
-                });
-
-            modelBuilder.Entity("IntroductionToWebAPIs.Entity.Product", b =>
-                {
-                    b.Navigation("Prices");
                 });
 #pragma warning restore 612, 618
         }
