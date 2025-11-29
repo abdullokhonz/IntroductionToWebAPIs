@@ -15,6 +15,7 @@ namespace IntroductionToWebAPIs.Infrastructure
         public DbSet<User> Users { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Client> Clients { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,6 +25,11 @@ namespace IntroductionToWebAPIs.Infrastructure
             modelBuilder.Entity<Unit>(entity => { entity.HasKey(p => p.Id); });
             modelBuilder.Entity<User>(entity => { entity.HasKey(p => p.Id); });
             modelBuilder.Entity<Supplier>(entity => { entity.HasKey(p => p.Id); });
+            modelBuilder.Entity<Category>()
+                .HasOne(c => c.Parent)
+                .WithMany(c => c.Children)
+                .HasForeignKey(c => c.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
             
             base.OnModelCreating(modelBuilder);
         }
