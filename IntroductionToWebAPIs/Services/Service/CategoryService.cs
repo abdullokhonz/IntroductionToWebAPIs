@@ -1,8 +1,10 @@
-﻿using IntroductionToWebAPIs.Entity;
+﻿using IntroductionToWebAPIs.DTO.CategoriesDTO;
+using IntroductionToWebAPIs.Entity;
 using IntroductionToWebAPIs.Infrastructure;
 using IntroductionToWebAPIs.Repositories;
 using IntroductionToWebAPIs.Responses;
 using IntroductionToWebAPIs.Services.IService;
+using Microsoft.EntityFrameworkCore;
 
 namespace IntroductionToWebAPIs.Services.Service
 {
@@ -85,6 +87,55 @@ namespace IntroductionToWebAPIs.Services.Service
                 return ServiceResponse<bool>.Fail("Failed to delete item");
 
             return ServiceResponse<bool>.Ok(true, "Item deleted successfully");
+        }
+
+
+
+        public async Task<IEnumerable<CategoryTreeDto>> GetCategoryTreeAsync()
+        {
+            var all = await _context.Categories.ToListAsync();
+
+            // Создаём словарь
+            var lookup = all.ToDictionary(c => c.Id, c => new CategoryTreeDto
+            {
+                Id = c.Id,
+                Name = c.Name
+            });
+
+            List<CategoryTreeDto> roots = new();
+
+            foreach (var c in all)
+            {
+                if (c.ParentId == null)
+                {
+                    // корневая категория
+                    roots.Add(lookup[c.Id]);
+                }
+                else
+                {
+                    if (lookup.TryGetValue(c.ParentId.Value, out var parent))
+                    {
+                        parent.AddSub(lookup[c.Id]);
+                    }
+                }
+            }
+
+            return roots;
+        }
+
+        public async Task<Category> CreateCategoryAsync(CategoryCreateDto dto)
+        {
+            var category = new Category
+            {
+                Name = dto.Name,
+                ParentId = dto.ParentId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Categories.Add(category);
+            await _context.SaveChangesAsync();
+
+            return category;
         }
 
 
