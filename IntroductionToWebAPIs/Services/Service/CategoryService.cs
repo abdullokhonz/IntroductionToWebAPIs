@@ -137,12 +137,5 @@ namespace IntroductionToWebAPIs.Services.Service
 
             return category;
         }
-
-
-
-        public async Task<Category?> PremiumGetByIdAsync(Guid id, CancellationToken ct = default)
-        {
-            return await _repository.GetByIdAsync(id, ct);
-        }
     }
 }

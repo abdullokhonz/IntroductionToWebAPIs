@@ -1,22 +1,23 @@
 ﻿using IntroductionToWebAPIs.DTO;
 using IntroductionToWebAPIs.Entity;
+using IntroductionToWebAPIs.Repositories;
 using IntroductionToWebAPIs.Services.IService;
 
 namespace IntroductionToWebAPIs.Services.Service
 {
     public class PremiumCalculationService : IPremiumCalculationService
     {
-        private readonly IBaseService<Client> _clientService;
         private const decimal BaseRate = 15000m; // базовая ставка ОСАГО-подобная
+        private readonly IPostgreSQLRepository<Client> _clientRepository;
 
-        public PremiumCalculationService(IBaseService<Client> clientService)
+        public PremiumCalculationService(IPostgreSQLRepository<Client> clientRepository)
         {
-            _clientService = clientService;
+            _clientRepository = clientRepository;
         }
 
         public async Task<PremiumCalculationResult> CalculateAsync(Guid clientId, CancellationToken ct = default)
         {
-            var client = await _clientService.PremiumGetByIdAsync(clientId);
+            var client = await PremiumGetByIdAsync(clientId);
             if (client == null)
                 throw new KeyNotFoundException("Клиент не найден");
 
@@ -38,14 +39,13 @@ namespace IntroductionToWebAPIs.Services.Service
 
             decimal finalPremium = BaseRate * ageFactor * regionFactor * carFactor * expFactor;
 
-            var explanation = $"""
-                Базовая ставка: {BaseRate:N0} ₽
-                × Возраст ({client.Age} лет): ×{ageFactor:F2}
-                × Регион ({client.Region}): ×{regionFactor:F2}
-                × Авто ({client.CarModel}, {client.CarPowerHp} л.с.): ×{carFactor:F2}
-                × Опыт и аварии: ×{expFactor:F2}
-                = ИТОГО: {finalPremium:N0} ₽
-             """;
+            var explanation =
+                $"Базовая ставка: {BaseRate:N0} ₽\n" +
+                $"× Возраст ({client.Age} лет): ×{ageFactor:F2}\n" +
+                $"× Регион ({client.Region}): ×{regionFactor:F2}\n" +
+                $"× Авто ({client.CarModel}, {client.CarPowerHp} л.с.): ×{carFactor:F2}\n" +
+                $"× Опыт и аварии: ×{expFactor:F2}\n" +
+                $"= ИТОГО: {finalPremium:N0} ₽";
 
             return new PremiumCalculationResult(
                 BasePremium: BaseRate,
@@ -102,6 +102,13 @@ namespace IntroductionToWebAPIs.Services.Service
             };
 
             return hasAccidents ? expFactor * 1.8m : expFactor;
+        }
+
+
+
+        public async Task<Client?> PremiumGetByIdAsync(Guid id, CancellationToken ct = default)
+        {
+            return await _clientRepository.GetByIdAsync(id, ct);
         }
     }
 }

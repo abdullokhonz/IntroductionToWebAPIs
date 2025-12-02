@@ -90,12 +90,5 @@ namespace IntroductionToWebAPIs.Services.Service
 
             return ServiceResponse<bool>.Ok(true, "Item deleted successfully");
         }
-
-
-
-        public async Task<T?> PremiumGetByIdAsync(Guid id, CancellationToken ct = default)
-        {
-            return await _repository.GetByIdAsync(id, ct);
-        }
     }
 }

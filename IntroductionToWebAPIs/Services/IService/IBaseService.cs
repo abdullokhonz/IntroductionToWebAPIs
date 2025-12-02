@@ -13,10 +13,6 @@ namespace IntroductionToWebAPIs.Services.IService
         Task<ServiceResponse<bool>> UpdateAsync(Guid id, TEntity item, CancellationToken ct = default);
 
         Task<ServiceResponse<bool>> DeleteAsync(Guid id, CancellationToken ct = default);
-
-
-
-        Task<TEntity?> PremiumGetByIdAsync(Guid id, CancellationToken ct = default);
     }
 }
  
