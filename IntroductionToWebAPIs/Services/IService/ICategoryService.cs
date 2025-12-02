@@ -8,6 +8,5 @@ namespace IntroductionToWebAPIs.Services.IService
         Task<IEnumerable<CategoryTreeDto>> GetCategoryTreeAsync();
 
         Task<Category> CreateCategoryAsync(CategoryCreateDto dto);
-
     }
 }

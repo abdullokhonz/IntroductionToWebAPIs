@@ -8,14 +8,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IntroductionToWebAPIs.Services.Service
 {
-    public class CategoryService : ICategoryService
+    public class PositionService : IPositionService
     {
         private readonly IConfiguration _config;
         private readonly PostgreSQLDbContext _context;
-        IPostgreSQLRepository<Category> _repository;
+        IPostgreSQLRepository<Position> _repository;
 
-        public CategoryService(
-            IPostgreSQLRepository<Category> repository,
+        public PositionService(
+            IPostgreSQLRepository<Position> repository,
             IConfiguration config,
             PostgreSQLDbContext context)
         {
@@ -26,40 +26,40 @@ namespace IntroductionToWebAPIs.Services.Service
 
 
 
-        public async Task<ServiceResponse<IEnumerable<Category>>> GetAllAsync(CancellationToken ct = default)
+        public async Task<ServiceResponse<IEnumerable<Position>>> GetAllAsync(CancellationToken ct = default)
         {
             var result = await _repository.GetAllAsync(ct);
 
             if (result == null || !result.Any())
-                return ServiceResponse<IEnumerable<Category>>.Fail("No items found");
+                return ServiceResponse<IEnumerable<Position>>.Fail("No items found");
 
-            return ServiceResponse<IEnumerable<Category>>.Ok(result, "Items retrieved");
+            return ServiceResponse<IEnumerable<Position>>.Ok(result, "Items retrieved");
         }
 
-        public async Task<ServiceResponse<Category?>> GetByIdAsync(Guid id, CancellationToken ct = default)
+        public async Task<ServiceResponse<Position?>> GetByIdAsync(Guid id, CancellationToken ct = default)
         {
             var existing = await _repository.GetByIdAsync(id, ct);
 
             if (existing == null)
-                return ServiceResponse<Category?>.Fail("Item not found");
+                return ServiceResponse<Position?>.Fail("Item not found");
 
-            return ServiceResponse<Category?>.Ok(existing, "Item retrieved");
+            return ServiceResponse<Position?>.Ok(existing, "Item retrieved");
         }
 
-        public async Task<ServiceResponse<Category>> CreateAsync(Category item, CancellationToken ct = default)
+        public async Task<ServiceResponse<Position>> CreateAsync(Position item, CancellationToken ct = default)
         {
             if (item == null)
-                return ServiceResponse<Category>.Fail("Item is null");
+                return ServiceResponse<Position>.Fail("Item is null");
 
             var result = await _repository.CreateAsync(item, ct);
 
             if (result == null)
-                return ServiceResponse<Category>.Fail("Failed to create item");
+                return ServiceResponse<Position>.Fail("Failed to create item");
 
-            return ServiceResponse<Category>.Ok(result, "Item created successfully");
+            return ServiceResponse<Position>.Ok(result, "Item created successfully");
         }
 
-        public async Task<ServiceResponse<bool>> UpdateAsync(Guid id, Category item, CancellationToken ct = default)
+        public async Task<ServiceResponse<bool>> UpdateAsync(Guid id, Position item, CancellationToken ct = default)
         {
             if (item == null)
                 return ServiceResponse<bool>.Fail("Item is null");
@@ -94,31 +94,30 @@ namespace IntroductionToWebAPIs.Services.Service
 
 
 
-        public async Task<IEnumerable<CategoryTreeDto>> GetCategoryTreeAsync()
+        public async Task<IEnumerable<PositionTreeDTO>> GetPositionTreeAsync()
         {
-            var all = await _context.Categories.ToListAsync();
+            var all = await _context.Positions.ToListAsync();
 
-            // Создаём словарь
-            var lookup = all.ToDictionary(c => c.Id, c => new CategoryTreeDto
+            var lookup = all.ToDictionary(p => p.Id, p => new PositionTreeDTO
             {
-                Id = c.Id,
-                Name = c.Name
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description
             });
 
-            List<CategoryTreeDto> roots = new();
+            List<PositionTreeDTO> roots = new();
 
-            foreach (var c in all)
+            foreach (var p in all)
             {
-                if (c.ParentId == null)
+                if (p.ParentId == null)
                 {
-                    // корневая категория
-                    roots.Add(lookup[c.Id]);
+                    roots.Add(lookup[p.Id]);
                 }
                 else
                 {
-                    if (lookup.TryGetValue(c.ParentId.Value, out var parent))
+                    if (lookup.TryGetValue(p.ParentId.Value, out var parent))
                     {
-                        parent.AddSub(lookup[c.Id]);
+                        parent.AddSub(lookup[p.Id]);
                     }
                 }
             }
@@ -126,19 +125,20 @@ namespace IntroductionToWebAPIs.Services.Service
             return roots;
         }
 
-        public async Task<Category> CreateCategoryAsync(CategoryCreateDto dto)
+        public async Task<Position> CreatePositionAsync(PositionCreateDTO dto)
         {
-            var category = new Category
+            var positon = new Position
             {
                 Name = dto.Name,
+                Description = dto.Description,
                 ParentId = dto.ParentId,
                 CreatedAt = DateTime.UtcNow
             };
 
-            _context.Categories.Add(category);
+            _context.Positions.Add(positon);
             await _context.SaveChangesAsync();
 
-            return category;
+            return positon;
         }
     }
 }

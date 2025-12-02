@@ -28,6 +28,9 @@ namespace IntroductionToWebAPIs.Services.Service
         {
             var result = await _repository.GetAllAsync(ct);
 
+            if (result == null || !result.Any())
+                return ServiceResponse<IEnumerable<Supplier>>.Fail("No items found");
+
             return ServiceResponse<IEnumerable<Supplier>>.Ok(result, "Items retrieved");
         }
 

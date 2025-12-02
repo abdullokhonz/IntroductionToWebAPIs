@@ -19,6 +19,7 @@ namespace IntroductionToWebAPIs.Infrastructure
         public DbSet<Warehouse> Warehouses { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Price> Prices { get; set; }
+        public DbSet<Position> Positions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,17 +29,32 @@ namespace IntroductionToWebAPIs.Infrastructure
             modelBuilder.Entity<Unit>(entity => { entity.HasKey(p => p.Id); });
             modelBuilder.Entity<User>(entity => { entity.HasKey(p => p.Id); });
             modelBuilder.Entity<Supplier>(entity => { entity.HasKey(p => p.Id); });
-            modelBuilder.Entity<Category>()
-                .HasOne(c => c.Parent)
-                .WithMany(c => c.Children)
-                .HasForeignKey(c => c.ParentId)
+            modelBuilder.Entity<Category>(b =>
+            {
+                b.HasKey(p => p.Id);
+                b.HasOne(p => p.Parent)
+                .WithMany(p => p.Children)
+                .HasForeignKey(p => p.ParentId)
                 .OnDelete(DeleteBehavior.Restrict);
+            });
             modelBuilder.Entity<Warehouse>(entity => { entity.HasKey(p => p.Id); });
             modelBuilder.Entity<Product>(entity => { entity.HasKey(p => p.Id); });
-            modelBuilder.Entity<Price>()
-                .HasOne(p => p.Product)
-                .WithMany(p => p.Prices)
-                .HasForeignKey(p => p.ProductId);
+            modelBuilder.Entity<Price>(b =>
+            {
+                b.HasKey(p => p.Id);
+                b.HasOne(p => p.Product)
+                 .WithMany(p => p.Prices)
+                 .HasForeignKey(p => p.ProductId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<Position>(b =>
+            {
+                b.HasKey(p => p.Id);
+                b.HasOne(p => p.Parent)
+                 .WithMany(p => p.Children)
+                 .HasForeignKey(p => p.ParentId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
 
             base.OnModelCreating(modelBuilder);
         }
