@@ -1,8 +1,6 @@
 using IntroductionToWebAPIs.Infrastructure;
-using IntroductionToWebAPIs.Repositories;
-using IntroductionToWebAPIs.Services.IService;
-using IntroductionToWebAPIs.Services.Service;
 using Microsoft.EntityFrameworkCore;
+using IntroductionToWebAPIs.Services.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,17 +10,8 @@ builder.Services.AddDbContext<PostgreSQLDbContext>(options =>
     .LogTo(Console.Write, LogLevel.Information)
     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
-builder.Services.AddScoped<IUnitService, UnitService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ISupplierService, SupplierService>();
-builder.Services.AddScoped<IPremiumCalculationService, PremiumCalculationService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<IWarehouseService, WarehouseService>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IPriceService, PriceService>();
-builder.Services.AddScoped<IPositionService, PositionService>();
-builder.Services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
-builder.Services.AddScoped(typeof(IPostgreSQLRepository<>), typeof(PostgreSQLRepository<>));
+// Services DI
+builder.Services.AddMyServices();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
