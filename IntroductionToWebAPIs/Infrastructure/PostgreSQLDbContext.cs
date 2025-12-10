@@ -20,6 +20,7 @@ namespace IntroductionToWebAPIs.Infrastructure
         public DbSet<Product> Products { get; set; }
         public DbSet<Price> Prices { get; set; }
         public DbSet<Position> Positions { get; set; }
+        public DbSet<Branch> Branches { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -48,6 +49,14 @@ namespace IntroductionToWebAPIs.Infrastructure
                  .OnDelete(DeleteBehavior.Cascade);
             });
             modelBuilder.Entity<Position>(b =>
+            {
+                b.HasKey(p => p.Id);
+                b.HasOne(p => p.Parent)
+                 .WithMany(p => p.Children)
+                 .HasForeignKey(p => p.ParentId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<Branch>(b =>
             {
                 b.HasKey(p => p.Id);
                 b.HasOne(p => p.Parent)

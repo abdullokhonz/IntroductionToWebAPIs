@@ -1,6 +1,5 @@
-using AutoMapper;
+using IntroductionToWebAPIs.Extensions;
 using IntroductionToWebAPIs.Infrastructure;
-using IntroductionToWebAPIs.Services.Service;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,30 +20,14 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Validate AutoMapper after app build
+app.ValidateAutoMapper();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
-
-var provider2 = builder.Services.BuildServiceProvider();
-var mapper = provider2.GetRequiredService<IMapper>();
-
-mapper.ConfigurationProvider.AssertConfigurationIsValid();
-
-try
-{
-    mapper.ConfigurationProvider.AssertConfigurationIsValid();
-    Console.WriteLine(" AutoMapper configuration is valid");
-}
-catch (AutoMapper.AutoMapperConfigurationException ex)
-{
-    Console.WriteLine(" AutoMapper configuration error:");
-    Console.WriteLine(ex.Message);
-    if (ex.InnerException != null)
-        Console.WriteLine(ex.InnerException.Message);
-    throw;
 }
 
 app.UseHttpsRedirection();

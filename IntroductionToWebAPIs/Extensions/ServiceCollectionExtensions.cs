@@ -1,7 +1,8 @@
 ﻿using IntroductionToWebAPIs.Repositories;
 using IntroductionToWebAPIs.Services.IService;
+using IntroductionToWebAPIs.Services.Service;
 
-namespace IntroductionToWebAPIs.Services.Service
+namespace IntroductionToWebAPIs.Extensions
 {
     public static class ServiceCollectionExtensions
     {
@@ -16,6 +17,7 @@ namespace IntroductionToWebAPIs.Services.Service
             service.AddScoped<IProductService, ProductService>();
             service.AddScoped<IPriceService, PriceService>();
             service.AddScoped<IPositionService, PositionService>();
+            service.AddScoped<IBranchService, BranchService>();
             service.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
             service.AddScoped(typeof(IPostgreSQLRepository<>), typeof(PostgreSQLRepository<>));
 
