@@ -1,4 +1,4 @@
-﻿namespace IntroductionToWebAPIs.DTO.CategoriesDTO
+﻿namespace IntroductionToWebAPIs.DTO.PositionsDTO
 {
     public class PositionCreateDTO
     {

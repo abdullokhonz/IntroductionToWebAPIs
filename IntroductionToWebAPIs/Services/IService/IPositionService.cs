@@ -1,4 +1,4 @@
-﻿using IntroductionToWebAPIs.DTO.CategoriesDTO;
+﻿using IntroductionToWebAPIs.DTO.PositionsDTO;
 using IntroductionToWebAPIs.Entity;
 
 namespace IntroductionToWebAPIs.Services.IService

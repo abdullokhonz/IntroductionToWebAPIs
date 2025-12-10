@@ -11,7 +11,7 @@ namespace IntroductionToWebAPIs.Infrastructure
 
         }
 
-        public DbSet<Unit> Units { get; set; }
+        public DbSet<Units> Units { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Client> Clients { get; set; }
@@ -26,7 +26,7 @@ namespace IntroductionToWebAPIs.Infrastructure
             modelBuilder.Ignore<BaseEntity>();
 
             // FluentAPI
-            modelBuilder.Entity<Unit>(entity => { entity.HasKey(p => p.Id); });
+            modelBuilder.Entity<Units>(entity => { entity.HasKey(p => p.Id); });
             modelBuilder.Entity<User>(entity => { entity.HasKey(p => p.Id); });
             modelBuilder.Entity<Supplier>(entity => { entity.HasKey(p => p.Id); });
             modelBuilder.Entity<Category>(b =>

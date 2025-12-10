@@ -3,17 +3,18 @@ using IntroductionToWebAPIs.Infrastructure;
 using IntroductionToWebAPIs.Repositories;
 using IntroductionToWebAPIs.Responses;
 using IntroductionToWebAPIs.Services.IService;
+using Microsoft.EntityFrameworkCore;
 
 namespace IntroductionToWebAPIs.Services.Service
 {
-    public class UnitService : IUnitService
+    public class UnitsService : IUnitsService
     {
         private readonly IConfiguration _config;
         private readonly PostgreSQLDbContext _context;
-        IPostgreSQLRepository<Unit> _repository;
+        IPostgreSQLRepository<Units> _repository;
 
-        public UnitService(
-            IPostgreSQLRepository<Unit> repository,
+        public UnitsService(
+            IPostgreSQLRepository<Units> repository,
             IConfiguration config,
             PostgreSQLDbContext context)
         {
@@ -24,40 +25,40 @@ namespace IntroductionToWebAPIs.Services.Service
 
 
 
-        public async Task<ServiceResponse<IEnumerable<Unit>>> GetAllAsync(CancellationToken ct = default)
+        public async Task<ServiceResponse<IEnumerable<Units>>> GetAllAsync(CancellationToken ct = default)
         {
             var result = await _repository.GetAllAsync(ct);
 
             if (result == null || !result.Any())
-                return ServiceResponse<IEnumerable<Unit>>.Fail("No items found");
+                return ServiceResponse<IEnumerable<Units>>.Fail("No items found");
 
-            return ServiceResponse<IEnumerable<Unit>>.Ok(result, "Items retrieved");
+            return ServiceResponse<IEnumerable<Units>>.Ok(result, "Items retrieved");
         }
 
-        public async Task<ServiceResponse<Unit?>> GetByIdAsync(Guid id, CancellationToken ct = default)
+        public async Task<ServiceResponse<Units?>> GetByIdAsync(Guid id, CancellationToken ct = default)
         {
             var existing = await _repository.GetByIdAsync(id, ct);
 
             if (existing == null)
-                return ServiceResponse<Unit?>.Fail("Item not found");
+                return ServiceResponse<Units?>.Fail("Item not found");
 
-            return ServiceResponse<Unit?>.Ok(existing, "Item retrieved");
+            return ServiceResponse<Units?>.Ok(existing, "Item retrieved");
         }
 
-        public async Task<ServiceResponse<Unit>> CreateAsync(Unit item, CancellationToken ct = default)
+        public async Task<ServiceResponse<Units>> CreateAsync(Units item, CancellationToken ct = default)
         {
             if (item == null)
-                return ServiceResponse<Unit>.Fail("Item is null");
+                return ServiceResponse<Units>.Fail("Item is null");
 
             var result = await _repository.CreateAsync(item, ct);
 
             if (result == null)
-                return ServiceResponse<Unit>.Fail("Failed to create item");
+                return ServiceResponse<Units>.Fail("Failed to create item");
 
-            return ServiceResponse<Unit>.Ok(result, "Item created successfully");
+            return ServiceResponse<Units>.Ok(result, "Item created successfully");
         }
 
-        public async Task<ServiceResponse<bool>> UpdateAsync(Guid id, Unit item, CancellationToken ct = default)
+        public async Task<ServiceResponse<bool>> UpdateAsync(Guid id, Units item, CancellationToken ct = default)
         {
             if (item == null)
                 return ServiceResponse<bool>.Fail("Item is null");
@@ -89,5 +90,25 @@ namespace IntroductionToWebAPIs.Services.Service
 
             return ServiceResponse<bool>.Ok(true, "Item deleted successfully");
         }
+
+        public async Task<Guid> AddAsync(Units entity, CancellationToken ct = default)
+        {
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+
+            // Защита от дубликатов по имени (по желанию)
+            var exists = await _context.Units
+                .AnyAsync(u => u.Name.ToLower() == entity.Name.Trim().ToLower(), ct);
+
+            if (exists)
+                throw new InvalidOperationException($"Единица измерения с именем '{entity.Name}' уже существует.");
+
+            entity.CreatedAt = DateTime.UtcNow;
+
+            await _context.Units.AddAsync(entity, ct);
+            await _context.SaveChangesAsync(ct);
+
+            return entity.Id;
+        }
+
     }
 }

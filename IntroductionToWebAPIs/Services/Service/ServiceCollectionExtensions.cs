@@ -7,7 +7,7 @@ namespace IntroductionToWebAPIs.Services.Service
     {
         public static void AddMyServices(this IServiceCollection service)
         {
-            service.AddScoped<IUnitService, UnitService>();
+            service.AddScoped<IUnitsService, UnitsService>();
             service.AddScoped<IUserService, UserService>();
             service.AddScoped<ISupplierService, SupplierService>();
             service.AddScoped<IPremiumCalculationService, PremiumCalculationService>();

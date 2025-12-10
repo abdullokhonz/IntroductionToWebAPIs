@@ -12,7 +12,7 @@ namespace IntroductionToWebAPIs.Entity
         public Category? Category { get; set; }
         public Guid UnitId { get; set; }
         [JsonIgnore]
-        public Unit? Unit { get; set; }
+        public Units? Unit { get; set; }
         public Guid SupplierId { get; set; }
         [JsonIgnore]
         public Supplier? Supplier { get; set; }

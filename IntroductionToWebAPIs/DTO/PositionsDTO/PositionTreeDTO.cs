@@ -1,6 +1,6 @@
 ﻿using IntroductionToWebAPIs.Entity.Components;
 
-namespace IntroductionToWebAPIs.DTO.CategoriesDTO
+namespace IntroductionToWebAPIs.DTO.PositionsDTO
 {
     public class PositionTreeDTO : IPositionComponent
     {

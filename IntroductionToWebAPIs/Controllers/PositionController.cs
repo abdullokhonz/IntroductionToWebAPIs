@@ -1,7 +1,7 @@
 ﻿using IntroductionToWebAPIs.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 using IntroductionToWebAPIs.Entity;
-using IntroductionToWebAPIs.DTO.CategoriesDTO;
+using IntroductionToWebAPIs.DTO.PositionsDTO;
 
 namespace IntroductionToWebAPIs.Controllers
 {
