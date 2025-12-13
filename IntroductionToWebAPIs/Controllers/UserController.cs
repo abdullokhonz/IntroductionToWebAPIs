@@ -1,4 +1,4 @@
-﻿using IntroductionToWebAPIs.Entity;
+﻿using IntroductionToWebAPIs.Entity.Users;
 using IntroductionToWebAPIs.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 

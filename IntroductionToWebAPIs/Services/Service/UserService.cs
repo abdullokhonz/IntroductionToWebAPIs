@@ -1,4 +1,4 @@
-﻿using IntroductionToWebAPIs.Entity;
+﻿using IntroductionToWebAPIs.Entity.Users;
 using IntroductionToWebAPIs.Infrastructure;
 using IntroductionToWebAPIs.Repositories;
 using IntroductionToWebAPIs.Services.IService;

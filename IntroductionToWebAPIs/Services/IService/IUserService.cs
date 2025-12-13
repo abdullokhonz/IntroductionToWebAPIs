@@ -1,4 +1,4 @@
-﻿using IntroductionToWebAPIs.Entity;
+﻿using IntroductionToWebAPIs.Entity.Users;
 
 namespace IntroductionToWebAPIs.Services.IService
 {

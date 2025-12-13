@@ -1,5 +1,6 @@
 ﻿using IntroductionToWebAPIs.BaseEntities;
 using IntroductionToWebAPIs.Entity;
+using IntroductionToWebAPIs.Entity.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace IntroductionToWebAPIs.Infrastructure
@@ -29,6 +30,19 @@ namespace IntroductionToWebAPIs.Infrastructure
             // FluentAPI
             modelBuilder.Entity<Units>(entity => { entity.HasKey(p => p.Id); });
             modelBuilder.Entity<User>(entity => { entity.HasKey(p => p.Id); });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(p => p.IsPersonalDataAccepted)
+                .IsRequired()
+                .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Profile)
+                .WithOne(p => p.User)
+                .HasForeignKey<UserProfile>(p => p.UserId);
+
             modelBuilder.Entity<Supplier>(entity => { entity.HasKey(p => p.Id); });
             modelBuilder.Entity<Category>(b =>
             {
