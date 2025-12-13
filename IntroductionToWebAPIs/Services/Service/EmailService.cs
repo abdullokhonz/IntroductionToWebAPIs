@@ -5,10 +5,10 @@ namespace IntroductionToWebAPIs.Services.Service
 {
     public class EmailService
     {
-        private readonly string _fromEmail;
-        private readonly string _fromName;
-        private readonly string _password;
-        private readonly string _smtpHost;
+        private readonly string? _fromEmail;
+        private readonly string? _fromName;
+        private readonly string? _password;
+        private readonly string? _smtpHost;
         private readonly int _smtpPort;
 
         public EmailService(IConfiguration configuration)
@@ -17,7 +17,7 @@ namespace IntroductionToWebAPIs.Services.Service
             _fromName = configuration["EmailSettings:FromName"];
             _password = configuration["EmailSettings:EmailPassword"];
             _smtpHost = configuration["EmailSettings:SmtpHost"];
-            _smtpPort = int.Parse(configuration["EmailSettings:SmtpPort"]);
+            _smtpPort = int.Parse(configuration["EmailSettings:SmtpPort"]!);
         }
 
         // Синхронный метод для общей отправки email
@@ -25,7 +25,7 @@ namespace IntroductionToWebAPIs.Services.Service
         {
             try
             {
-                MailAddress from = new MailAddress(_fromEmail, _fromName);
+                MailAddress from = new MailAddress(_fromEmail!, _fromName);
                 MailAddress to = new MailAddress(toEmail);
 
                 using (MailMessage msg = new MailMessage(from, to))
@@ -59,7 +59,7 @@ namespace IntroductionToWebAPIs.Services.Service
 
             try
             {
-                MailAddress from = new MailAddress(_fromEmail, _fromName);
+                MailAddress from = new MailAddress(_fromEmail!, _fromName);
                 MailAddress to = new MailAddress(email);
 
                 using (MailMessage msg = new MailMessage(from, to))

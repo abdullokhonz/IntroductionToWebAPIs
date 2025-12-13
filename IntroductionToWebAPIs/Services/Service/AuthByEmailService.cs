@@ -15,6 +15,7 @@ namespace IntroductionToWebAPIs.Services.Service
         private readonly PostgreSQLDbContext _context;
         private readonly EmailService _emailService;
         private readonly AuthOptions _authOptions;
+
         public AuthByEmailService(IOptions<AuthOptions> authOptions, PostgreSQLDbContext context, EmailService emailService)
         {
             _context = context;
@@ -119,7 +120,7 @@ namespace IntroductionToWebAPIs.Services.Service
             return true;
         }
 
-        public async Task<User> GetUserByEmail(string email)
+        public async Task<User?> GetUserByEmail(string email)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }

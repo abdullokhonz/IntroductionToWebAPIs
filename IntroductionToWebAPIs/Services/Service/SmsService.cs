@@ -15,11 +15,11 @@ namespace IntroductionToWebAPIs.Services.Service
         {
             _config = new Dictionary<string, string>
             {
-                ["dlm"] = configuration["SmsSettings:Dlm"],
-                ["t"] = configuration["SmsSettings:T"],
-                ["login"] = configuration["SmsSettings:Login"],
-                ["pass_hash"] = configuration["SmsSettings:PassHash"],
-                ["sender"] = configuration["SmsSettings:Sender"]
+                ["dlm"] = configuration["SmsSettings:Dlm"]!,
+                ["t"] = configuration["SmsSettings:T"]!,
+                ["login"] = configuration["SmsSettings:Login"]!,
+                ["pass_hash"] = configuration["SmsSettings:PassHash"]!,
+                ["sender"] = configuration["SmsSettings:Sender"]!
             };
         }
 

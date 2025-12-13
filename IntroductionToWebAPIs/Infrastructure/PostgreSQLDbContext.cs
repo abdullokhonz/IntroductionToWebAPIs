@@ -29,19 +29,17 @@ namespace IntroductionToWebAPIs.Infrastructure
 
             // FluentAPI
             modelBuilder.Entity<Units>(entity => { entity.HasKey(p => p.Id); });
-            modelBuilder.Entity<User>(entity => { entity.HasKey(p => p.Id); });
 
-            modelBuilder.Entity<User>(entity =>
+            modelBuilder.Entity<User>(b =>
             {
-                entity.Property(p => p.IsPersonalDataAccepted)
-                .IsRequired()
-                .HasDefaultValue(false);
+                b.HasKey(p => p.Id);
+                b.Property(p => p.IsPersonalDataAccepted)
+                    .IsRequired()
+                    .HasDefaultValue(false);
+                b.HasOne(p => p.Profile)
+                    .WithOne(p => p.User)
+                    .HasForeignKey<UserProfile>(p => p.UserId);
             });
-
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.Profile)
-                .WithOne(p => p.User)
-                .HasForeignKey<UserProfile>(p => p.UserId);
 
             modelBuilder.Entity<Supplier>(entity => { entity.HasKey(p => p.Id); });
             modelBuilder.Entity<Category>(b =>
