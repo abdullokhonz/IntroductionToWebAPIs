@@ -41,7 +41,7 @@ namespace IntroductionToWebAPIs.Services.Service
                         smtpClient.Send(msg);
                     }
                 }
-            }
+            } 
             catch (Exception ex)
             {
                 throw new Exception($"Ошибка при отправке email: {ex.Message}");

@@ -70,7 +70,7 @@ namespace IntroductionToWebAPIs.Services.Service
             };
         }
 
-        public async Task<TokenInfo> GeneratedJWT(User user)
+        public async Task<TokenInfo> GeneratedJWT(User? user)
         {
             if (user == null)
                 throw new ArgumentException("Invalid username or password.");

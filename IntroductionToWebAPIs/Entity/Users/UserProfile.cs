@@ -1,14 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using IntroductionToWebAPIs.BaseEntities;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IntroductionToWebAPIs.Entity.Users
 {
-    public class UserProfile
+    public class UserProfile : BaseEntity
     {
         [ForeignKey("User")]
         public Guid UserId { get; set; }
         public User? User { get; set; }
         public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = String.Empty;
+        public string LastName { get; set; } = string.Empty;
         public string? MiddleName { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public Guid AddressId { get; set; }

@@ -14,6 +14,7 @@ namespace IntroductionToWebAPIs.Infrastructure
 
         public DbSet<Units> Units { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Client> Clients { get; set; }
         public DbSet<Category> Categories { get; set; }
