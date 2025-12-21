@@ -1,7 +1,9 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using FluentValidation;
 using IntroductionToWebAPIs.Extensions;
 using IntroductionToWebAPIs.Infrastructure;
+using IntroductionToWebAPIs.Validations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -51,6 +53,9 @@ builder.Services.AddApiVersioning(options =>
     options.GroupNameFormat = "'v'VVV";        // v1, v2, v1.1
     options.SubstituteApiVersionInUrl = true;
 });
+
+// FluentValidation
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 
 var app = builder.Build();
 

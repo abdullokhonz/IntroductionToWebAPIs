@@ -8,6 +8,7 @@ namespace IntroductionToWebAPIs.Extensions
     {
         public static void AddMyServices(this IServiceCollection service)
         {
+            service.AddScoped<AuthByPhoneService>();
             service.AddScoped<AuthByEmailService>();
             service.AddScoped<ISmsService, SmsService>();
             service.AddScoped<EmailService>();
