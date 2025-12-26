@@ -83,7 +83,7 @@ namespace IntroductionToWebAPIs.Controllers
                 var user = new User
                 {
                     Id = Guid.NewGuid(),
-                    Login = model.Login,
+                    Login = model.Login!,
                     PhoneNumber = model.PhoneNumber,
                     Password = Entity.Users.User.HashPassword(model.Password),
                     IsConfirmed = false,
@@ -121,7 +121,7 @@ namespace IntroductionToWebAPIs.Controllers
 
             var user = await _authByPhoneService.GetUserByPhone(model.PhoneNumber);
 
-            var tokens = await _authByPhoneService.GeneratedJWT(user);
+            var tokens = await _authByPhoneService.GeneratedJWT(user!);
 
             return Ok(new { message = "Телефон подтвержден!", tokens });
         }

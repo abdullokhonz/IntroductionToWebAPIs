@@ -58,5 +58,4 @@ namespace IntroductionToWebAPIs.Validations
             return existingUser == null;
         }
     }
-
 }

@@ -33,7 +33,7 @@ builder.Services.AddSwaggerGen(options =>
             description.GroupName,
             new OpenApiInfo
             {
-                Title = $"Restaurant API",
+                Title = $"IntroductionToWebAPIs",
                 Version = description.GroupName,
                 Description = description.IsDeprecated ? "Deprecated" : null
             });
