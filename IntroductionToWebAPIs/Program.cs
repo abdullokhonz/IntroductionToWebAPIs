@@ -2,14 +2,28 @@
 using Asp.Versioning.ApiExplorer;
 using FluentValidation;
 using IntroductionToWebAPIs.Extensions;
+using IntroductionToWebAPIs.HealthChecks;
 using IntroductionToWebAPIs.Infrastructure;
 using IntroductionToWebAPIs.Validations;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
+using System.Text.Json;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+//if (!builder.Environment.IsEnvironment("Testing"))
+//{
+//    builder.Services.AddDbContext<PostgreSQLDbContext>(options =>
+//    options.UseNpgsql(builder.Configuration.GetConnectionString("DbPostgres"))
+//    .LogTo(Console.Write, LogLevel.Information)
+//    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+//}
+
 builder.Services.AddDbContext<PostgreSQLDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DbPostgres"))
     .LogTo(Console.Write, LogLevel.Information)
@@ -19,6 +33,12 @@ builder.Services.AddDbContext<PostgreSQLDbContext>(options =>
 builder.Services.AddMyServices();
 
 builder.Services.AddControllers();
+
+// HealthChecks
+builder.Services.AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>("database")
+    .AddCheck("self", () => HealthCheckResult.Healthy("Application is running"));
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -59,6 +79,18 @@ builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>()
 
 var app = builder.Build();
 
+var env = app.Services.GetRequiredService<IWebHostEnvironment>();
+string uploadsPath;
+
+if (env.IsEnvironment("Testing")) // если тестовое окружение
+{
+    uploadsPath = Path.Combine(Path.GetTempPath(), "IntroductionToWebAPIs", "uploads");
+}
+else // для разработки/прода
+{
+    uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+}
+
 // Validate AutoMapper after app build
 app.ValidateAutoMapper();
 
@@ -84,6 +116,42 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+// Health check endpoints
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+
+        var response = new
+        {
+            status = report.Status.ToString(),
+            duration = report.TotalDuration.TotalMilliseconds,
+            timestamp = DateTime.UtcNow,
+            checks = report.Entries.Select(entry => new
+            {
+                name = entry.Key,
+                status = entry.Value.Status.ToString(),
+                duration = entry.Value.Duration.TotalMilliseconds,
+                description = entry.Value.Description,
+                data = entry.Value.Data
+            })
+        };
+
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
+        }));
+    }
+});
+
+app.MapHealthChecks("/health/simple");
+app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Name == "self" });
+app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = check => check.Name == "database" });
+
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
