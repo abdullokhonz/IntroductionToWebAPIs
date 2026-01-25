@@ -44,8 +44,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     // Автоматически создаём документ для каждой версии API
+    #pragma warning disable ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
     var provider = builder.Services.BuildServiceProvider()
         .GetRequiredService<IApiVersionDescriptionProvider>();
+    #pragma warning restore ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
 
     foreach (var description in provider.ApiVersionDescriptions)
     {
